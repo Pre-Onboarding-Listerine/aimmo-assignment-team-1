@@ -19,6 +19,7 @@ class Posting(Document):
     comments = ListField(Comment)
     hits = IntField(default=0)
     category = StringField(max_length=50)
+    hit_members = ListField(Member)
 
     meta = {'collection': 'postings'}
 
@@ -34,7 +35,6 @@ class Posting(Document):
             return False
 
     def save(self, *args, **kwargs):
-        self.comments.save()
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

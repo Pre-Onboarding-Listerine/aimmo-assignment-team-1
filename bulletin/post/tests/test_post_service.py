@@ -112,7 +112,7 @@ class PostServiceTest(unittest.TestCase):
         )
         get_by_id.return_value = returned
 
-        actual = self.post_service.details(post_id=returned.id)
+        actual = self.post_service.details(post_id=returned.id, member=None)
         expected = PostDetails(
             id=1,
             author=returned.member.username,
@@ -122,7 +122,7 @@ class PostServiceTest(unittest.TestCase):
             created_at=returned.created_at.strftime("%m-%d-%Y, %H:%M:%S"),
             updated_at=returned.updated_at.strftime("%m-%d-%Y, %H:%M:%S"),
             comments=[],
-            hits=0
+            hits=1
         )
 
         assert_that(actual).is_equal_to(expected)

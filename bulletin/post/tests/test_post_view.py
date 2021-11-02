@@ -166,6 +166,7 @@ class PostViewTest(unittest.TestCase):
         )
 
         assert_that(response.status_code).is_equal_to(HTTPStatus.OK)
+        details.assert_called_with(1, None)
 
 
 
