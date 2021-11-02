@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'member',
+    'security',
+    'post',
 ]
 
 MIDDLEWARE = [
@@ -73,12 +76,23 @@ WSGI_APPLICATION = 'bulletin.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+
+import mongoengine
+
+mongoengine.connect(
+    db="prod",
+    host="mongodb://root:example@localhost:27017/",
+    username="root",
+    password="example",
+    authentication_source='admin'
+)
 
 
 # Password validation
@@ -123,3 +137,8 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# JWT settings
+
+JWT_SECRET = 'wanted'
+JWT_ALGORITHM = 'HS256'

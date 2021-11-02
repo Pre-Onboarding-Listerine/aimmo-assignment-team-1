@@ -7,10 +7,13 @@ authors = ["Joowan Kim <rlawndhks217@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 django = "3.2.9"
+PyJWT = "2.3.0"
+mongoengine = "0.23.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "6.2.5"
 assertpy = "1.1"
+mongomock = "3.23.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
