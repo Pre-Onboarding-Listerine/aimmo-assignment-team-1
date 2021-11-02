@@ -101,3 +101,23 @@ class PostListViewTest(unittest.TestCase):
             )
         )
 
+    @mock.patch.object(PostService, "list")
+    def test_get_posts_by_keyword(self, list):
+        list.return_value = PostList(posts=[])
+        response = self.client.get(
+            "/posts/postings",
+            data={
+                "limit": 10,
+                "offset": 0,
+                "keyword": "asdf"
+            }
+        )
+
+        assert_that(response.status_code).is_equal_to(HTTPStatus.OK)
+        list.assert_called_with(
+            ListParams(
+                limit=10,
+                offset=0,
+                keyword="asdf"
+            )
+        )

@@ -52,11 +52,13 @@ class PostListView(View):
         limit = int(request.GET.get("limit", 10))
         offset = int(request.GET.get("offset", 0))
         category = request.GET.get("category", None)
+        keyword = request.GET.get("keyword", None)
 
         params = ListParams(
             limit=limit,
             offset=offset,
-            category=category
+            category=category,
+            keyword=keyword
         )
 
         postings = self.post_service.list(params)

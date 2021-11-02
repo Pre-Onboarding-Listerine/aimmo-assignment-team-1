@@ -88,7 +88,7 @@ import mongoengine
 
 mongoengine.connect(
     db="prod",
-    host="mongodb://root:example@mongo:27017/",
+    host="mongodb://root:example@localhost:27017/",
     username="root",
     password="example",
     authentication_source='admin'
