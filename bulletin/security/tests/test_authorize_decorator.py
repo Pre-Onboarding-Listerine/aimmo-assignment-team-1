@@ -6,17 +6,19 @@ from assertpy import assert_that
 from django.conf import settings
 from django.http import HttpRequest
 
-from ..service import AuthorizationService
+from ..service import authorize
 from member.models import Member
 from member.service import MemberService
 
 
+class Dummy:
+    @authorize
+    def func(self, request, member):
+        return member
+
+
 class AuthorizeServiceTest(unittest.TestCase):
     def setUp(self) -> None:
-        class Dummy:
-            @AuthorizationService
-            def func(self, request, member):
-                return member
         self.decorated = Dummy().func
 
     @mock.patch.object(MemberService, 'get_member')

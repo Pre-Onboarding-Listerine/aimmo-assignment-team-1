@@ -1,3 +1,5 @@
+from functools import wraps
+
 import jwt
 from django.conf import settings
 
@@ -28,12 +30,11 @@ class LoginService:
             raise Exception
 
 
-class AuthorizationService:
-    def __init__(self, func):
-        self.member_service = MemberService()
-        self.func = func
+def authorize(method):
+    member_service = MemberService()
 
-    def __call__(self, request, *args, **kwargs):
+    @wraps(method)
+    def wrapper(self, request, *args, **kwargs):
         access_token = request.headers.get("Authorization")
         if access_token is None:
             # todo: AuthorizationHeaderEmptyException
@@ -41,8 +42,9 @@ class AuthorizationService:
         access_token = access_token[len("Bearer "):]
         try:
             payload = jwt.decode(access_token, settings.JWT_SECRET, algorithms=settings.JWT_ALGORITHM)
-            member = self.member_service.get_member(payload.get("username"))
-            return self.func(self, request, member, *args, **kwargs)
+            member = member_service.get_member(payload.get("username"))
+            return method(self, request, member, *args, **kwargs)
         except jwt.InvalidSignatureError:
             # todo: UnauthorizedException
             raise Exception
+    return wrapper

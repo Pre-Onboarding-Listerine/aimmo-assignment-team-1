@@ -6,12 +6,16 @@ class Member(Document):
     password = StringField(max_length=1000)
 
     meta = {
+        'collection': 'members',
         'indexes': [
             {'fields': ['username'], 'unique': True},
         ],
     }
 
     def __eq__(self, other):
+        if other is None:
+            # todo: NoneTypeException
+            raise Exception
         if self.username == other.username:
             return True
         else:
