@@ -7,6 +7,7 @@ from unittest import mock
 from assertpy import assert_that
 from django.test import Client
 
+from ..dto.list_params import ListParams
 from ..dto.post_details import PostDetails
 from ..dto.post_list import PostList
 from ..service import PostService
@@ -23,6 +24,7 @@ class PostListViewTest(unittest.TestCase):
                 PostDetails(
                     id=1,
                     author="qweads",
+                    category="before",
                     title="before title",
                     content="before content",
                     created_at=datetime.utcnow().strftime("%m-%d-%Y, %H:%M:%S"),
@@ -33,6 +35,7 @@ class PostListViewTest(unittest.TestCase):
                 PostDetails(
                     id=2,
                     author="asdwqe",
+                    category="before",
                     title="before title",
                     content="before content",
                     created_at=datetime.utcnow().strftime("%m-%d-%Y, %H:%M:%S"),
@@ -58,6 +61,7 @@ class PostListViewTest(unittest.TestCase):
                 'author': 'qweads',
                 'comments': [],
                 'content': 'before content',
+                'category': 'before',
                 'created_at': post_list.posts[0].created_at,
                 'hits': 0,
                 'id': 1,
@@ -67,6 +71,7 @@ class PostListViewTest(unittest.TestCase):
                 'author': 'asdwqe',
                 'comments': [],
                 'content': 'before content',
+                'category': 'before',
                 'created_at': post_list.posts[1].created_at,
                 'hits': 0,
                 'id': 2,
@@ -74,3 +79,25 @@ class PostListViewTest(unittest.TestCase):
             }
         ]
         assert_that(content['posts']).is_equal_to(expected)
+
+    @mock.patch.object(PostService, "list")
+    def test_get_posts_by_category(self, list):
+        list.return_value = PostList(posts=[])
+        response = self.client.get(
+            "/posts/postings",
+            data={
+                "limit": 10,
+                "offset": 0,
+                "category": "before"
+            }
+        )
+
+        assert_that(response.status_code).is_equal_to(HTTPStatus.OK)
+        list.assert_called_with(
+            ListParams(
+                limit=10,
+                offset=0,
+                category="before"
+            )
+        )
+

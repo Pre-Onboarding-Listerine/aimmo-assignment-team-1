@@ -5,6 +5,7 @@ from mongoengine import Document, ReferenceField, StringField, DateTimeField, Li
 from member.models import Member
 
 from .comment import Comment
+from ..dto.list_params import ListParams
 from ..dto.post_details import PostDetails
 
 
@@ -17,6 +18,7 @@ class Posting(Document):
     updated_at = DateTimeField(default=datetime.utcnow)
     comments = ListField(Comment)
     hits = IntField(default=0)
+    category = StringField(max_length=50)
 
     meta = {'collection': 'postings'}
 
@@ -43,6 +45,7 @@ class Posting(Document):
         return PostDetails(
             id=self.id,
             author=self.member.username,
+            category=self.category,
             title=self.title,
             content=self.content,
             created_at=self.created_at.strftime("%m-%d-%Y, %H:%M:%S"),
@@ -60,5 +63,8 @@ class Posting(Document):
         return cls.objects(id=post_id).first()
 
     @classmethod
-    def get_partial(cls, offset, limit):
-        return list(cls.objects.skip(offset).limit(offset+limit))
+    def get_partial(cls, params: ListParams):
+        kwargs = {key: value for key, value in params.to_filter().items() if value is not None}
+        return list(
+            cls.objects.filter(**kwargs).skip(params.offset).limit(params.offset + params.limit)
+        )

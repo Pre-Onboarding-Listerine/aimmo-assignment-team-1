@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from .dto.deleted_post_id import DeletedPostId
+from .dto.list_params import ListParams
 from .dto.post_changes import PostChanges
 from .dto.post_content import PostContents
 from member.models import Member
@@ -55,6 +56,6 @@ class PostService:
             raise Exception
         return target.to_details()
 
-    def list(self, offset: int, limit: int):
-        postings = Posting.get_partial(offset, limit)
+    def list(self, params: ListParams):
+        postings = Posting.get_partial(params)
         return PostList(posts=[posting.to_details() for posting in postings])

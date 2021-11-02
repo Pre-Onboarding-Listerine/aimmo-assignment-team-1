@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.views import View
 
 from .dto.deleted_post_id import DeletedPostId
+from .dto.list_params import ListParams
 from .dto.post_changes import PostChanges
 from .dto.post_content import PostContents
 from .service import PostService
@@ -50,6 +51,14 @@ class PostListView(View):
     def get(self, request):
         limit = int(request.GET.get("limit", 10))
         offset = int(request.GET.get("offset", 0))
-        postings = self.post_service.list(offset, limit)
+        category = request.GET.get("category", None)
+
+        params = ListParams(
+            limit=limit,
+            offset=offset,
+            category=category
+        )
+
+        postings = self.post_service.list(params)
         return JsonResponse(data=postings.to_dict(), status=HTTPStatus.OK)
 
