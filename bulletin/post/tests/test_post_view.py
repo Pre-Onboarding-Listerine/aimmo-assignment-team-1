@@ -1,5 +1,6 @@
 import json
 import unittest
+from datetime import datetime
 from http import HTTPStatus
 from unittest import mock
 from unittest.mock import MagicMock
@@ -14,6 +15,8 @@ from member.models import Member
 from ..dto.deleted_post_id import DeletedPostId
 from ..dto.post_changes import PostChanges
 from ..dto.post_content import PostContents
+from ..dto.post_details import PostDetails
+from ..models.posting import Posting
 from ..service import PostService
 from member.service import MemberService
 
@@ -137,6 +140,30 @@ class PostViewTest(unittest.TestCase):
             password="123qwe"
         )
         remove.assert_called_with(deleted_post_id, deleter)
+
+    @mock.patch.object(PostService, 'details')
+    def test_get_details_with_post_id(self, details):
+        author = Member(
+            username="asd",
+            password="123qwe"
+        )
+        details.return_value = PostDetails(
+            id=1,
+            author=author.username,
+            title="before title",
+            content="before content",
+            created_at=datetime.utcnow().strftime("%m-%d-%Y, %H:%M:%S"),
+            updated_at=datetime.utcnow().strftime("%m-%d-%Y, %H:%M:%S"),
+            comments=[],
+            hits=0
+        )
+
+        response = self.client.get(
+            "/posts/1"
+        )
+
+        assert_that(response.status_code).is_equal_to(HTTPStatus.OK)
+        # assert_that(response.json)
 
 
 

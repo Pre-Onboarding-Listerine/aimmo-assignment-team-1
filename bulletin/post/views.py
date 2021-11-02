@@ -36,3 +36,7 @@ class PostView(View):
         deleted_post_id = DeletedPostId(**data)
         self.post_service.remove(deleted_post_id, member)
         return JsonResponse(data={}, status=HTTPStatus.NO_CONTENT)
+
+    def get(self, request, post_id):
+        post_details = self.post_service.details(post_id)
+        return JsonResponse(data=post_details.to_dict(), status=HTTPStatus.OK)

@@ -46,3 +46,10 @@ class PostService:
             # todo: Unauthorized
             raise Exception
         target.delete()
+
+    def details(self, post_id: int):
+        target = Posting.get_by_id(post_id=post_id)
+        if target is None:
+            # todo: PostNotFoundException
+            raise Exception
+        return target.to_details()

@@ -13,6 +13,8 @@ class Member(Document):
     }
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
         if other is None:
             # todo: NoneTypeException
             raise Exception

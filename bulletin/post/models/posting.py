@@ -5,6 +5,7 @@ from mongoengine import Document, ReferenceField, StringField, DateTimeField, Li
 from member.models import Member
 
 from .comment import Comment
+from ..dto.post_details import PostDetails
 
 
 class Posting(Document):
@@ -20,6 +21,8 @@ class Posting(Document):
     meta = {'collection': 'postings'}
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
         if other is None:
             # todo: NoneTypeException
             raise Exception
@@ -35,6 +38,18 @@ class Posting(Document):
     def delete(self, *args, **kwargs):
         self.comments.delete()
         super().delete(*args, **kwargs)
+
+    def to_details(self):
+        return PostDetails(
+            id=self.id,
+            author=self.member.username,
+            title=self.title,
+            content=self.content,
+            created_at=self.created_at.strftime("%m-%d-%Y, %H:%M:%S"),
+            updated_at=self.updated_at.strftime("%m-%d-%Y, %H:%M:%S"),
+            comments=list(self.comments),
+            hits=self.hits
+        )
 
     @classmethod
     def add(cls, posting):

@@ -2,9 +2,12 @@ import unittest
 from datetime import datetime
 from unittest import mock
 
+from assertpy import assert_that
+
 from ..dto.deleted_post_id import DeletedPostId
 from ..dto.post_changes import PostChanges
 from ..dto.post_content import PostContents
+from ..dto.post_details import PostDetails
 from ..models.posting import Posting
 from ..service import PostService
 from member.models import Member
@@ -83,4 +86,35 @@ class PostServiceTest(unittest.TestCase):
         self.post_service.remove(deleted_post_id, deleter)
         delete.assert_called_with()
 
+    @mock.patch.object(Posting, "get_by_id")
+    def test_details_with_exist_posting(self, get_by_id):
+        author = Member(
+            username="asd",
+            password="123qwe"
+        )
+        returned = Posting(
+            id=1,
+            member=author,
+            title="before title",
+            content="before content",
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+            comments=[],
+            hits=0
+        )
+        get_by_id.return_value = returned
+
+        actual = self.post_service.details(post_id=returned.id)
+        expected = PostDetails(
+            id=1,
+            author=returned.member.username,
+            title="before title",
+            content="before content",
+            created_at=returned.created_at.strftime("%m-%d-%Y, %H:%M:%S"),
+            updated_at=returned.updated_at.strftime("%m-%d-%Y, %H:%M:%S"),
+            comments=[],
+            hits=0
+        )
+
+        assert_that(actual).is_equal_to(expected)
 
