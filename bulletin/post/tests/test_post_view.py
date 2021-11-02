@@ -43,7 +43,8 @@ class PostViewTest(unittest.TestCase):
                 "title": "json title",
                 "content": "json content"
             }),
-            content_type='application/json'
+            content_type="application/json",
+            **headers
         )
 
         assert_that(response.status_code).is_equal_to(HTTPStatus.CREATED)
