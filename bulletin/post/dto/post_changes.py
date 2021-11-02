@@ -5,5 +5,6 @@ from typing import Optional
 @dataclass
 class PostChanges:
     id: int
-    title: Optional['str']
-    content: Optional['str']
+    category: Optional[str] = None
+    title: Optional['str'] = None
+    content: Optional['str'] = None

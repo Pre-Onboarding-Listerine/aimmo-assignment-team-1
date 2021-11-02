@@ -48,3 +48,22 @@ def authorize(method):
             # todo: UnauthorizedException
             raise Exception
     return wrapper
+
+
+def general_authorize(method):
+    member_service = MemberService()
+
+    @wraps(method)
+    def wrapper(self, request, *args, **kwargs):
+        access_token = request.headers.get("Authorization")
+        if access_token is None:
+            return method(self, request, None, *args, **kwargs)
+        access_token = access_token[len("Bearer "):]
+        try:
+            payload = jwt.decode(access_token, settings.JWT_SECRET, algorithms=settings.JWT_ALGORITHM)
+            member = member_service.get_member(payload.get("username"))
+            return method(self, request, member, *args, **kwargs)
+        except jwt.InvalidSignatureError:
+            # todo: UnauthorizedException
+            raise Exception
+    return wrapper

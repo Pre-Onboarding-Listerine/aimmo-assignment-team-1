@@ -5,6 +5,7 @@ from unittest import mock
 from assertpy import assert_that
 
 from ..dto.deleted_post_id import DeletedPostId
+from ..dto.list_params import ListParams
 from ..dto.post_changes import PostChanges
 from ..dto.post_content import PostContents
 from ..dto.post_details import PostDetails
@@ -26,14 +27,16 @@ class PostServiceTest(unittest.TestCase):
         )
         contents = PostContents(
             title="json title",
-            content="json content"
+            content="json content",
+            category = "before"
         )
 
         self.post_service.write(contents, author)
         new_posting = Posting(
             member=author,
             title=contents.title,
-            content=contents.content
+            content=contents.content,
+            category=contents.category
         )
 
         add.assert_called_with(new_posting)
@@ -48,6 +51,7 @@ class PostServiceTest(unittest.TestCase):
         get_by_id.return_value = Posting(
             id=1,
             member=updater,
+            category="before",
             title="before title",
             content="before content",
             created_at=datetime.utcnow(),
@@ -58,6 +62,7 @@ class PostServiceTest(unittest.TestCase):
 
         changes = PostChanges(
             id=1,
+            category=None,
             title="json title",
             content="qweadswqead"
         )
@@ -77,6 +82,7 @@ class PostServiceTest(unittest.TestCase):
         get_by_id.return_value = Posting(
             id=1,
             member=deleter,
+            category="before",
             title="before title",
             content="before content",
             created_at=datetime.utcnow(),
@@ -96,6 +102,7 @@ class PostServiceTest(unittest.TestCase):
         returned = Posting(
             id=1,
             member=author,
+            category="before",
             title="before title",
             content="before content",
             created_at=datetime.utcnow(),
@@ -105,16 +112,17 @@ class PostServiceTest(unittest.TestCase):
         )
         get_by_id.return_value = returned
 
-        actual = self.post_service.details(post_id=returned.id)
+        actual = self.post_service.details(post_id=returned.id, member=None)
         expected = PostDetails(
             id=1,
             author=returned.member.username,
+            category="before",
             title="before title",
             content="before content",
             created_at=returned.created_at.strftime("%m-%d-%Y, %H:%M:%S"),
             updated_at=returned.updated_at.strftime("%m-%d-%Y, %H:%M:%S"),
             comments=[],
-            hits=0
+            hits=1
         )
 
         assert_that(actual).is_equal_to(expected)
@@ -137,6 +145,7 @@ class PostServiceTest(unittest.TestCase):
             Posting(
                 id=1,
                 member=author1,
+                category="before",
                 title="before title",
                 content="before content",
                 created_at=datetime.utcnow(),
@@ -147,6 +156,7 @@ class PostServiceTest(unittest.TestCase):
             Posting(
                 id=2,
                 member=author2,
+                category="before",
                 title="before title",
                 content="before content",
                 created_at=datetime.utcnow(),
@@ -157,12 +167,17 @@ class PostServiceTest(unittest.TestCase):
         ]
         get_partial.return_value = posts
 
-        actual = self.post_service.list(offset=offset, limit=limit)
+        params = ListParams(
+            offset=offset,
+            limit=limit
+        )
+        actual = self.post_service.list(params)
         expected = PostList(
             posts=[
                 PostDetails(
                     id=1,
                     author="qweads",
+                    category="before",
                     title="before title",
                     content="before content",
                     created_at=posts[0].created_at.strftime("%m-%d-%Y, %H:%M:%S"),
@@ -173,6 +188,7 @@ class PostServiceTest(unittest.TestCase):
                 PostDetails(
                     id=2,
                     author="asdwqe",
+                    category="before",
                     title="before title",
                     content="before content",
                     created_at=posts[1].created_at.strftime("%m-%d-%Y, %H:%M:%S"),

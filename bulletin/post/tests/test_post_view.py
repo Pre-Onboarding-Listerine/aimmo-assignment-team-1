@@ -46,7 +46,8 @@ class PostViewTest(unittest.TestCase):
             "/posts",
             data=json.dumps({
                 "title": "json title",
-                "content": "json content"
+                "content": "json content",
+                "category": "json"
             }),
             content_type="application/json",
             **headers
@@ -56,7 +57,8 @@ class PostViewTest(unittest.TestCase):
         write.assert_called_with(
             PostContents(
                 title="json title",
-                content="json content"
+                content="json content",
+                category="json"
             ),
             Member(
                 username="asd",
@@ -86,7 +88,7 @@ class PostViewTest(unittest.TestCase):
             data=json.dumps({
                 "id": 1,
                 "title": "json title",
-                "content": "json content"
+                "content": "json content",
             }),
             content_type="application/json",
             **headers
@@ -152,6 +154,7 @@ class PostViewTest(unittest.TestCase):
             author=author.username,
             title="before title",
             content="before content",
+            category="before",
             created_at=datetime.utcnow().strftime("%m-%d-%Y, %H:%M:%S"),
             updated_at=datetime.utcnow().strftime("%m-%d-%Y, %H:%M:%S"),
             comments=[],
@@ -163,6 +166,7 @@ class PostViewTest(unittest.TestCase):
         )
 
         assert_that(response.status_code).is_equal_to(HTTPStatus.OK)
+        details.assert_called_with(1, None)
 
 
 

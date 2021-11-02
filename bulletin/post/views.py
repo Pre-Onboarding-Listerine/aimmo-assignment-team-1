@@ -5,10 +5,11 @@ from django.http import JsonResponse
 from django.views import View
 
 from .dto.deleted_post_id import DeletedPostId
+from .dto.list_params import ListParams
 from .dto.post_changes import PostChanges
 from .dto.post_content import PostContents
 from .service import PostService
-from security.service import authorize
+from security.service import authorize, general_authorize
 
 
 class PostView(View):
@@ -37,8 +38,9 @@ class PostView(View):
         self.post_service.remove(deleted_post_id, member)
         return JsonResponse(data={}, status=HTTPStatus.NO_CONTENT)
 
-    def get(self, request, post_id):
-        post_details = self.post_service.details(post_id)
+    @general_authorize
+    def get(self, request, member, post_id):
+        post_details = self.post_service.details(post_id, member)
         return JsonResponse(data=post_details.to_dict(), status=HTTPStatus.OK)
 
 
@@ -50,6 +52,16 @@ class PostListView(View):
     def get(self, request):
         limit = int(request.GET.get("limit", 10))
         offset = int(request.GET.get("offset", 0))
-        postings = self.post_service.list(offset, limit)
+        category = request.GET.get("category", None)
+        keyword = request.GET.get("keyword", None)
+
+        params = ListParams(
+            limit=limit,
+            offset=offset,
+            category=category,
+            keyword=keyword
+        )
+
+        postings = self.post_service.list(params)
         return JsonResponse(data=postings.to_dict(), status=HTTPStatus.OK)
 

@@ -1,6 +1,8 @@
 from datetime import datetime
+from typing import Optional
 
 from .dto.deleted_post_id import DeletedPostId
+from .dto.list_params import ListParams
 from .dto.post_changes import PostChanges
 from .dto.post_content import PostContents
 from member.models import Member
@@ -48,13 +50,19 @@ class PostService:
             raise Exception
         target.delete()
 
-    def details(self, post_id: int):
+    def details(self, post_id: int, member: Optional[Member]):
         target = Posting.get_by_id(post_id=post_id)
         if target is None:
             # todo: PostNotFoundException
             raise Exception
+        if member not in target.hit_members:
+            target.hits += 1
+            if member:
+                target.hit_members.append(member)
+            target.member.save()
+            target.save()
         return target.to_details()
 
-    def list(self, offset: int, limit: int):
-        postings = Posting.get_partial(offset, limit)
+    def list(self, params: ListParams):
+        postings = Posting.get_partial(params)
         return PostList(posts=[posting.to_details() for posting in postings])
