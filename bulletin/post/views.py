@@ -40,3 +40,16 @@ class PostView(View):
     def get(self, request, post_id):
         post_details = self.post_service.details(post_id)
         return JsonResponse(data=post_details.to_dict(), status=HTTPStatus.OK)
+
+
+class PostListView(View):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.post_service = PostService()
+
+    def get(self, request):
+        limit = int(request.GET.get("limit", 10))
+        offset = int(request.GET.get("offset", 0))
+        postings = self.post_service.list(offset, limit)
+        return JsonResponse(data=postings.to_dict(), status=HTTPStatus.OK)
+

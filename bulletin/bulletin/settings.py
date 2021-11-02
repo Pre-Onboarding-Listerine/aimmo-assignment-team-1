@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-j!hjsjiuar%+&h0j3&^xnz&r&mv5)^dnvp8&=(#!oun8c!75lp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -88,7 +88,7 @@ import mongoengine
 
 mongoengine.connect(
     db="prod",
-    host="mongodb://root:example@localhost:27017/",
+    host="mongodb://root:example@mongo:27017/",
     username="root",
     password="example",
     authentication_source='admin'

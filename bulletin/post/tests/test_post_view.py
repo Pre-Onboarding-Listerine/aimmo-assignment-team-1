@@ -163,7 +163,6 @@ class PostViewTest(unittest.TestCase):
         )
 
         assert_that(response.status_code).is_equal_to(HTTPStatus.OK)
-        # assert_that(response.json)
 
 
 

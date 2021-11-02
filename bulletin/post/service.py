@@ -5,6 +5,7 @@ from .dto.post_changes import PostChanges
 from .dto.post_content import PostContents
 from member.models import Member
 
+from .dto.post_list import PostList
 from .models.posting import Posting
 
 
@@ -53,3 +54,7 @@ class PostService:
             # todo: PostNotFoundException
             raise Exception
         return target.to_details()
+
+    def list(self, offset: int, limit: int):
+        postings = Posting.get_partial(offset, limit)
+        return PostList(posts=[posting.to_details() for posting in postings])

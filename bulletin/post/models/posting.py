@@ -58,3 +58,7 @@ class Posting(Document):
     @classmethod
     def get_by_id(cls, post_id):
         return cls.objects(id=post_id).first()
+
+    @classmethod
+    def get_partial(cls, offset, limit):
+        return list(cls.objects.skip(offset).limit(offset+limit))
