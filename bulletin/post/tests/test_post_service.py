@@ -1,6 +1,8 @@
 import unittest
+from datetime import datetime
 from unittest import mock
 
+from ..dto.post_changes import PostChanges
 from ..dto.post_content import PostContents
 from ..models.posting import Posting
 from ..service import PostService
@@ -30,4 +32,30 @@ class PostServiceTest(unittest.TestCase):
         )
 
         add.assert_called_with(new_posting)
+
+    @mock.patch.object(Posting, "save")
+    @mock.patch.object(Posting, "get_by_id")
+    def test_edit_with_author(self, get_by_id, save):
+        updater = Member(
+            username="asd",
+            password="123qwe"
+        )
+        get_by_id.return_value = Posting(
+            id=1,
+            member=updater,
+            title="before title",
+            content="before content",
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+            comments=[],
+            hits=0
+        )
+
+        changes = PostChanges(
+            id=1,
+            title="json title",
+            content="qweadswqead"
+        )
+        self.post_service.edit(changes, updater)
+        save.assert_called_with()
 

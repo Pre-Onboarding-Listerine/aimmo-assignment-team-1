@@ -11,6 +11,7 @@ from django.test import Client
 
 from member.models import Member
 
+from ..dto.post_changes import PostChanges
 from ..dto.post_content import PostContents
 from ..service import PostService
 from member.service import MemberService
@@ -58,3 +59,46 @@ class PostViewTest(unittest.TestCase):
                 password="123qwe"
             )
         )
+
+    @mock.patch.object(PostService, 'edit')
+    @mock.patch.object(MemberService, 'get_member')
+    def test_update_post_with_author(self, get_member, edit):
+        get_member.return_value = Member(
+            username="asd",
+            password="123qwe"
+        )
+        access_token = "Bearer " + jwt.encode(
+            payload={
+                "username": "asd"
+            },
+            key=settings.JWT_SECRET,
+            algorithm=settings.JWT_ALGORITHM
+        )
+
+        headers = {"HTTP_Authorization": access_token}
+
+        response = self.client.patch(
+            "/posts",
+            data=json.dumps({
+                "id": 1,
+                "title": "json title",
+                "content": "json content"
+            }),
+            content_type="application/json",
+            **headers
+        )
+
+        assert_that(response.status_code).is_equal_to(HTTPStatus.OK)
+
+        changes = PostChanges(
+            id=1,
+            title="json title",
+            content="json content"
+        )
+        updater = Member(
+            username="asd",
+            password="123qwe"
+        )
+        edit.assert_called_with(changes, updater)
+
+

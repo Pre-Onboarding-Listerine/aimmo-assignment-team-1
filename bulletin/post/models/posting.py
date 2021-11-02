@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from mongoengine import Document, ReferenceField, StringField, DateTimeField, ListField, IntField, LongField
+from mongoengine import Document, ReferenceField, StringField, DateTimeField, ListField, IntField
 
 from member.models import Member
 
@@ -8,7 +8,7 @@ from .comment import Comment
 
 
 class Posting(Document):
-    id = LongField(primary_key=True)
+    id = IntField(primary_key=True)
     member = ReferenceField(Member)
     title = StringField(max_length=100)
     content = StringField(max_length=500)
@@ -28,6 +28,14 @@ class Posting(Document):
         else:
             return False
 
+    def save(self, *args, **kwargs):
+        self.comments.save()
+        super().save(*args, **kwargs)
+
     @classmethod
     def add(cls, posting):
         cls.objects.create(posting)
+
+    @classmethod
+    def get_by_id(cls, post_id):
+        return cls.objects(id=post_id).first()
