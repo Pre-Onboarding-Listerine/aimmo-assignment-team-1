@@ -1,10 +1,16 @@
 from functools import wraps
+from http import HTTPStatus
 
 import jwt
 from django.conf import settings
+from django.http import JsonResponse
 
 from .dto.login_info import LoginInfo
 from member.service import MemberService
+
+from member.exceptions import MemberNotFoundException
+
+from .exceptions import IncorrectPasswordException
 
 
 class LoginService:
@@ -14,8 +20,7 @@ class LoginService:
     def authenticate(self, info: LoginInfo):
         member = self.member_service.get_member(username=info.username)
         if member is None:
-            # todo: create MemberNotFoundException
-            raise Exception
+            raise MemberNotFoundException
 
         if member.password == info.password:
             return "Bearer " + jwt.encode(
@@ -26,8 +31,7 @@ class LoginService:
                 algorithm=settings.JWT_ALGORITHM
             )
         else:
-            # todo: create IncorrectPasswordException
-            raise Exception
+            raise IncorrectPasswordException
 
 
 def authorize(method):
@@ -37,16 +41,14 @@ def authorize(method):
     def wrapper(self, request, *args, **kwargs):
         access_token = request.headers.get("Authorization")
         if access_token is None:
-            # todo: AuthorizationHeaderEmptyException
-            raise Exception
+            return JsonResponse(data={}, status=HTTPStatus.UNAUTHORIZED)
         access_token = access_token[len("Bearer "):]
         try:
             payload = jwt.decode(access_token, settings.JWT_SECRET, algorithms=settings.JWT_ALGORITHM)
             member = member_service.get_member(payload.get("username"))
             return method(self, request, member, *args, **kwargs)
         except jwt.InvalidSignatureError:
-            # todo: UnauthorizedException
-            raise Exception
+            return JsonResponse(data={}, status=HTTPStatus.UNAUTHORIZED)
     return wrapper
 
 
@@ -64,6 +66,5 @@ def general_authorize(method):
             member = member_service.get_member(payload.get("username"))
             return method(self, request, member, *args, **kwargs)
         except jwt.InvalidSignatureError:
-            # todo: UnauthorizedException
-            raise Exception
+            return JsonResponse(data={}, status=HTTPStatus.UNAUTHORIZED)
     return wrapper

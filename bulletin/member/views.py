@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.views import View
 
 from .dto.signup_info import SignUpInfo
+from .exceptions import MemberNotFoundException, DuplicatedIdException
 from .service import MemberService
 
 
@@ -16,5 +17,10 @@ class SignUpView(View):
     def post(self, request):
         data = json.loads(request.body)
         signup_info = SignUpInfo(**data)
-        self.service.add_member(signup_info)
+        try:
+            self.service.add_member(signup_info)
+        except MemberNotFoundException:
+            return JsonResponse(data={}, status=HTTPStatus.NOT_FOUND)
+        except DuplicatedIdException:
+            return JsonResponse(data={}, status=HTTPStatus.CONFLICT)
         return JsonResponse(data={}, status=HTTPStatus.CREATED)

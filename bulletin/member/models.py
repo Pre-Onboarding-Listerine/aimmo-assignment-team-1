@@ -1,5 +1,7 @@
 from mongoengine import Document, StringField
 
+from .exceptions import NoneTypeException
+
 
 class Member(Document):
     username = StringField(max_length=50)
@@ -16,8 +18,7 @@ class Member(Document):
         if not isinstance(other, self.__class__):
             return False
         if other is None:
-            # todo: NoneTypeException
-            raise Exception
+            raise NoneTypeException
         if self.username == other.username:
             return True
         else:

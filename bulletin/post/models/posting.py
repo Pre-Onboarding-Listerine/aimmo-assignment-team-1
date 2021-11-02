@@ -7,6 +7,7 @@ from member.models import Member
 from .comment import Comment
 from ..dto.list_params import ListParams
 from ..dto.post_details import PostDetails
+from member.exceptions import NoneTypeException
 
 
 class Posting(Document):
@@ -27,8 +28,7 @@ class Posting(Document):
         if not isinstance(other, self.__class__):
             return False
         if other is None:
-            # todo: NoneTypeException
-            raise Exception
+            raise NoneTypeException
         if self.id == other.id:
             return True
         else:
