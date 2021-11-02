@@ -29,7 +29,7 @@ class LoginServiceTest(unittest.TestCase):
             password="123qwe"
         )
         access_token = self.service.authenticate(login_info)
-        expected = jwt.encode(
+        expected = "Bearer " + jwt.encode(
             payload={"username": "asd"},
             key=settings.JWT_SECRET,
             algorithm=settings.JWT_ALGORITHM
