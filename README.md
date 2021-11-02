@@ -36,7 +36,7 @@
 
 각 app에서 각 함수 및 메소드들을 `tests` 디렉토리의 테스트들로 유닛테스트를 실행할 수 있습니다. 
 
-### Layered Architecture
+## Layered Architecture
 
 각 app들은 `views-service-models`의 계층을 갖고 있습니다. 
 또한, 각 app들은 컴포넌트끼리 데이터를 전달 및 도메인의 노출을 방지하기 위한 `dto`를 보유하고 있습니다.
@@ -47,5 +47,216 @@
 - `models`: 비즈니스 로직 연산을 통한 결과물을 데이터 베이스에 반영하기 위한 코드를 포함하고 있습니다.
 
 ## Swagger나 Postman을 통한 API 테스트할때 필요한 상세 방법
+### Endpoint
+
+- 회원가입: /members
+- 로그인: /security
+- 게시물 작성 post: /posts
+- 게시물 수정 patch: /posts
+- 게시물 삭제 delete: /posts
+- 게시물 확인 get: /posts/<int:post_id>
+- 게시물 리스트 get: /posts/postings
+
+-----
+## 회원가입
+### request 예시
+
+POST 
+/members 
+username="asd" 
+password="123qwer"
+
+### response 예시
+#### 성공시
+```
+{
+    "message": "SUCCESS"
+}
+```
+#### 실패시
+
+```
+{ 
+    "message" : "MemberNotFoundException"
+}
+```
+
+```
+{
+    "message" : "DuplicatedIdException"
+}
+```
+
+## 로그인
+### request 예시
+
+POST 
+/security 
+username="asd" 
+password="123qwer"
+
+### response 예시
+#### 성공시
+``` 
+{
+  "access_token": access_token
+}
+```
+
+#### 실패시
+
+```
+{
+    "message" : "IncorrectPasswordException"
+}
+```
+
+```
+{ 
+    "message" : " AuthorizationHeaderEmptyException"
+}
+```
+
+```
+{ 
+    "message" : " UnauthorizedException"
+}
+```
+
+## 게시물 작성
+### request 예시
+
+POST
+/posts 
+title="json title"
+content="json content"
+category="json"
+
+### response 예시
+#### 성공시
+``` 
+{
+
+}
+```
+#### 실패 시 
+```
+{ 
+    "message" : "PostNotFoundException"
+}
+```
+
+## 게시물 수정
+### request 예시
+
+PATCH
+/posts 
+id: 1, 
+title: "json title"
+content: "json content"
 
 
+### response 예시
+#### 성공시
+``` 
+{
+ 
+}
+```
+#### 실패 시 
+
+```
+{ 
+    "message" : "PostNotFoundException"
+}
+```
+```
+{ 
+    "message" : "UnauthorizedException"
+}
+```
+
+## 게시물 삭제
+### request 예시
+
+DELETE
+/posts
+
+### response 예시
+#### 성공시
+``` 
+{
+
+}
+```
+#### 실패 시 
+
+```
+{ 
+    "message" : "PostNotFoundException"
+}
+```
+```
+{ 
+    "message" : "UnauthorizedException"
+}
+```
+
+## 게시물 확인
+### request 예시
+
+GET 
+/posts/1
+
+### response 예시
+#### 성공시
+``` 
+{
+  "id": 1,
+  "author": "이지은",
+  title: "before title",
+  content: "before content",
+  category: "before",
+  created_at: "01-11-2021",
+  updated_at: "02-11-2021",
+  hits: 3
+}
+```
+#### 실패 시 
+
+```
+{ 
+    "message" : "PostNotFoundException"
+}
+```
+
+## 게시물 리스트
+### ### request 예시
+
+GET 
+/posts
+/postings?limit=3&offset=0
+
+### response 예시
+#### 성공시
+``` 
+[{
+  "category": "a"
+   "keyword": "가나다"
+},
+{
+  "category": "b"
+   "keyword": "마바사"
+},
+{
+  "category": "c"
+   "content": "아자차"
+}]
+```
+#### 실패 시 
+
+```
+{ 
+    "message" : "PostNotFoundException"
+}
+```
