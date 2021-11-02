@@ -8,7 +8,9 @@ from .dto.post_content import PostContents
 from member.models import Member
 
 from .dto.post_list import PostList
+from .exceptions import PostNotFoundException
 from .models.posting import Posting
+from security.exceptions import UnauthorizedException
 
 
 class PostService:
@@ -23,11 +25,9 @@ class PostService:
     def edit(self, changes: PostChanges, updater: Member):
         posting = Posting.get_by_id(post_id=changes.id)
         if posting is None:
-            # todo: PostNotFoundException
-            raise Exception
+            raise PostNotFoundException
         if posting.member != updater:
-            # todo: Unauthorized
-            raise Exception
+            raise UnauthorizedException
         edited = Posting(
             id=changes.id,
             member=updater,
@@ -43,18 +43,15 @@ class PostService:
     def remove(self, deleted_post_id: DeletedPostId, deleter: Member):
         target = Posting.get_by_id(post_id=deleted_post_id.id)
         if target is None:
-            # todo: PostNotFoundException
-            raise Exception
+            raise PostNotFoundException
         if target.member != deleter:
-            # todo: Unauthorized
-            raise Exception
+            raise UnauthorizedException
         target.delete()
 
     def details(self, post_id: int, member: Optional[Member]):
         target = Posting.get_by_id(post_id=post_id)
         if target is None:
-            # todo: PostNotFoundException
-            raise Exception
+            raise PostNotFoundException
         if member not in target.hit_members:
             target.hits += 1
             if member:

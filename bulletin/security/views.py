@@ -5,7 +5,9 @@ from django.http import JsonResponse, HttpRequest
 from django.views import View
 
 from .dto.login_info import LoginInfo
+from .exceptions import IncorrectPasswordException
 from .service import LoginService
+from member.exceptions import MemberNotFoundException
 
 
 class LoginView(View):
@@ -16,7 +18,13 @@ class LoginView(View):
     def post(self, request: HttpRequest):
         data = json.loads(request.body)
         login_info = LoginInfo(**data)
-        access_token = self.service.authenticate(login_info)
+        try:
+            access_token = self.service.authenticate(login_info)
+        except MemberNotFoundException:
+            return JsonResponse(data={}, status=HTTPStatus.NOT_FOUND)
+        except IncorrectPasswordException:
+            return JsonResponse(data={}, status=HTTPStatus.UNAUTHORIZED)
+
         return JsonResponse(
             data={
                 "access_token": access_token

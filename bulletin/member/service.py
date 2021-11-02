@@ -1,4 +1,5 @@
 from .dto.signup_info import SignUpInfo
+from .exceptions import MemberNotFoundException, DuplicatedIdException
 from .models import Member
 
 
@@ -6,8 +7,7 @@ class MemberService:
     def get_member(self, username: str):
         member = Member.get_by_username(username=username)
         if member is None:
-            # todo: MemberNotFoundException
-            raise Exception
+            raise MemberNotFoundException
         else:
             return member
 
@@ -18,6 +18,5 @@ class MemberService:
         )
         try:
             return Member.add(new_member)
-        except Exception as e:
-            # todo: duplicated ID exception
-            raise e
+        except Exception:
+            raise DuplicatedIdException
