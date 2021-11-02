@@ -4,6 +4,7 @@ from http import HTTPStatus
 from django.http import JsonResponse
 from django.views import View
 
+from .dto.deleted_post_id import DeletedPostId
 from .dto.post_changes import PostChanges
 from .dto.post_content import PostContents
 from .service import PostService
@@ -28,3 +29,10 @@ class PostView(View):
         post_changes = PostChanges(**data)
         self.post_service.edit(post_changes, member)
         return JsonResponse(data={}, status=HTTPStatus.OK)
+
+    @authorize
+    def delete(self, request, member):
+        data = json.loads(request.body)
+        deleted_post_id = DeletedPostId(**data)
+        self.post_service.remove(deleted_post_id, member)
+        return JsonResponse(data={}, status=HTTPStatus.NO_CONTENT)

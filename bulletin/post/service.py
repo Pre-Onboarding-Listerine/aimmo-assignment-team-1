@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from .dto.deleted_post_id import DeletedPostId
 from .dto.post_changes import PostChanges
 from .dto.post_content import PostContents
 from member.models import Member
@@ -35,3 +36,13 @@ class PostService:
             hits=posting.hits
         )
         edited.save()
+
+    def remove(self, deleted_post_id: DeletedPostId, deleter: Member):
+        target = Posting.get_by_id(post_id=deleted_post_id.id)
+        if target is None:
+            # todo: PostNotFoundException
+            raise Exception
+        if target.member != deleter:
+            # todo: Unauthorized
+            raise Exception
+        target.delete()

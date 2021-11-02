@@ -11,6 +11,7 @@ from django.test import Client
 
 from member.models import Member
 
+from ..dto.deleted_post_id import DeletedPostId
 from ..dto.post_changes import PostChanges
 from ..dto.post_content import PostContents
 from ..service import PostService
@@ -100,5 +101,43 @@ class PostViewTest(unittest.TestCase):
             password="123qwe"
         )
         edit.assert_called_with(changes, updater)
+
+    @mock.patch.object(PostService, 'remove')
+    @mock.patch.object(MemberService, 'get_member')
+    def test_delete_with_author(self, get_member, remove):
+        get_member.return_value = Member(
+            username="asd",
+            password="123qwe"
+        )
+        access_token = "Bearer " + jwt.encode(
+            payload={
+                "username": "asd"
+            },
+            key=settings.JWT_SECRET,
+            algorithm=settings.JWT_ALGORITHM
+        )
+
+        headers = {"HTTP_Authorization": access_token}
+
+        response = self.client.delete(
+            "/posts",
+            data=json.dumps({
+                "id": 1
+            }),
+            content_type="application/json",
+            **headers
+        )
+        assert_that(response.status_code).is_equal_to(HTTPStatus.NO_CONTENT)
+
+        deleted_post_id = DeletedPostId(
+            id=1
+        )
+        deleter = Member(
+            username="asd",
+            password="123qwe"
+        )
+        remove.assert_called_with(deleted_post_id, deleter)
+
+
 
 

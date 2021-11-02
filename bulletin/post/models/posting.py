@@ -32,6 +32,10 @@ class Posting(Document):
         self.comments.save()
         super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        self.comments.delete()
+        super().delete(*args, **kwargs)
+
     @classmethod
     def add(cls, posting):
         cls.objects.create(posting)

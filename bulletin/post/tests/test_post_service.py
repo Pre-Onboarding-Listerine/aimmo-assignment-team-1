@@ -2,6 +2,7 @@ import unittest
 from datetime import datetime
 from unittest import mock
 
+from ..dto.deleted_post_id import DeletedPostId
 from ..dto.post_changes import PostChanges
 from ..dto.post_content import PostContents
 from ..models.posting import Posting
@@ -58,4 +59,28 @@ class PostServiceTest(unittest.TestCase):
         )
         self.post_service.edit(changes, updater)
         save.assert_called_with()
+
+    @mock.patch.object(Posting, "delete")
+    @mock.patch.object(Posting, "get_by_id")
+    def test_remove_with_author(self, get_by_id, delete):
+        deleter = Member(
+            username="asd",
+            password="123qwe"
+        )
+        deleted_post_id = DeletedPostId(
+            id=1
+        )
+        get_by_id.return_value = Posting(
+            id=1,
+            member=deleter,
+            title="before title",
+            content="before content",
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+            comments=[],
+            hits=0
+        )
+        self.post_service.remove(deleted_post_id, deleter)
+        delete.assert_called_with()
+
 
