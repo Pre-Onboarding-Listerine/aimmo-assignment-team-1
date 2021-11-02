@@ -4,6 +4,7 @@ from unittest import mock
 
 from assertpy import assert_that
 
+from ..dto.signup_info import SignUpInfo
 from ..models import Member
 from ..service import MemberService
 
@@ -29,4 +30,18 @@ class MemberServiceTest(unittest.TestCase):
 
         assert_that(member.username).is_equal_to(expected.username)
         assert_that(member.password).is_equal_to(expected.password)
+
+    @mock.patch.object(Member, 'add')
+    def test_add_member_with_not_exist_member(self, add):
+        signup_info = SignUpInfo(
+            username="asd",
+            password="123qwe"
+        )
+        self.service.add_member(signup_info=signup_info)
+        add.assert_called_with(
+            Member(
+                username="asd",
+                password="123qwe"
+            )
+        )
 

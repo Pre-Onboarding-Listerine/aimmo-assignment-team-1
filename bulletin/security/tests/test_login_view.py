@@ -1,7 +1,7 @@
 import json
 import unittest
+from http import HTTPStatus
 from unittest import mock
-from unittest.mock import MagicMock
 
 from assertpy import assert_that
 from django.test import Client
@@ -25,7 +25,7 @@ class LoginViewTest(unittest.TestCase):
             content_type="application/json"
         )
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert_that(response.status_code).is_equal_to(HTTPStatus.OK)
 
         content = json.loads(response.content)
         assert_that(content['access_token']).is_equal_to("access_token")

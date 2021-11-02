@@ -11,6 +11,12 @@ class Member(Document):
         ],
     }
 
+    def __eq__(self, other):
+        if self.username == other.username:
+            return True
+        else:
+            return False
+
     @classmethod
     def get_by_username(cls, username: str):
         return cls.objects(username=username).first()
