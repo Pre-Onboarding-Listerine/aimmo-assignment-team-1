@@ -19,8 +19,6 @@ class SignUpView(View):
         signup_info = SignUpInfo(**data)
         try:
             self.service.add_member(signup_info)
-        except MemberNotFoundException:
-            return JsonResponse(data={}, status=HTTPStatus.NOT_FOUND)
         except DuplicatedIdException:
             return JsonResponse(data={}, status=HTTPStatus.CONFLICT)
         return JsonResponse(data={}, status=HTTPStatus.CREATED)

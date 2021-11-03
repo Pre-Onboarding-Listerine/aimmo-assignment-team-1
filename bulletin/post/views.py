@@ -25,7 +25,7 @@ class PostView(View):
         data = json.loads(request.body)
         post_contents = PostContents(**data)
         self.post_service.write(post_contents, member)
-        return JsonResponse(data={'message': 'SUCCESS'}, status=HTTPStatus.CREATED)
+        return JsonResponse(data={}, status=HTTPStatus.CREATED)
 
     @authorize
     def patch(self, request, member):
