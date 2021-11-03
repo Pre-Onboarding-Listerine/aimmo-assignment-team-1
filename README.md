@@ -213,7 +213,7 @@ Content-Type: application/json
 
 ```json
 {
-    "id"; 1   // 삭제할 게시물의 식별자를 의미합니다.
+    "id": 1   // 삭제할 게시물의 식별자를 의미합니다.
 }
 ```
 
